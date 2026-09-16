@@ -1,0 +1,278 @@
+.repayments-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Metrics Summary Cards */
+.metrics-overview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.metric-card {
+  padding: 1.25rem 1.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.metric-icon-box {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-icon-box.blue {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60a5fa;
+}
+
+.metric-icon-box.emerald {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+}
+
+.metric-icon-box.amber {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+}
+
+.metric-icon-box.rose {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f87171;
+}
+
+.metric-main-value {
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.metric-footer-text {
+  font-size: 0.775rem;
+  color: var(--text-muted);
+}
+
+/* Filter Bar */
+.repayments-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.15rem 1.5rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.checkbox-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+}
+
+.checkbox-input {
+  accent-color: #f43f5e;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* Table Custom Cells */
+.purpose-subtext {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.borrower-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.borrower-avatar-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.borrower-cell-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.borrower-cell-name {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.borrower-cell-phone {
+  font-size: 0.725rem;
+  color: var(--text-muted);
+}
+
+.installment-tag {
+  font-size: 0.785rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  background: rgba(16, 185, 129, 0.08);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+}
+
+.amount-cell {
+  font-weight: 600;
+  font-size: 0.885rem;
+}
+
+.amount-cell.due {
+  color: var(--text-main);
+}
+
+.amount-cell.paid {
+  color: #34d399;
+}
+
+.amount-cell.outstanding {
+  color: #fbbf24;
+}
+
+.amount-cell.zero {
+  color: var(--text-muted);
+}
+
+.repayment-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.view-schedule-btn {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.785rem;
+}
+
+.pay-btn {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.785rem;
+}
+
+.pay-btn:hover {
+  background: #059669;
+  color: #ffffff;
+}
+
+/* Schedule Modal */
+.schedule-modal-card {
+  max-width: 900px;
+  width: 90vw;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.schedule-table-wrapper {
+  overflow-x: auto;
+  max-height: 60vh;
+}
+
+.schedule-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.schedule-table th {
+  background: rgba(15, 23, 42, 0.5);
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.schedule-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-main);
+}
+
+.method-tag {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Payment Form Modal */
+.payment-modal-card {
+  max-width: 540px;
+}
+
+.payment-intro {
+  font-size: 0.885rem;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+  line-height: 1.45;
+}
+
+.form-select {
+  width: 100%;
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 0.75rem;
+  color: var(--text-main);
+  font-size: 0.875rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.form-select:focus {
+  border-color: var(--accent-primary);
+}
+
+.pay-confirm-btn {
+  background: #059669;
+  color: #ffffff;
+}
+
+.pay-confirm-btn:hover:not(:disabled) {
+  background: #10b981;
+}
