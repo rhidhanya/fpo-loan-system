@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, getMe } = require('../controllers/authController');
+const { register, login, getMe, googleAuth } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
 // Public routes
 router.post('/register', register);
 router.post('/login', login);
+router.post('/google', googleAuth);
 
 // Protected route
 router.get('/me', protect, getMe);

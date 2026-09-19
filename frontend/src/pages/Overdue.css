@@ -1,0 +1,222 @@
+/* =========================================
+   Overdue / Defaulters Page
+   ========================================= */
+
+.overdue-page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.overdue-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+
+.overdue-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.overdue-filter-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.overdue-loader-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+
+/* Table */
+.overdue-table-panel {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.overdue-table-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.overdue-results-count {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.overdue-table-responsive {
+  overflow-x: auto;
+}
+
+.overdue-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.overdue-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.2);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.overdue-table td {
+  padding: 0.9rem 1rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-color);
+  vertical-align: middle;
+}
+
+.overdue-table tr:last-child td {
+  border-bottom: none;
+}
+
+.overdue-row td {
+  background: rgba(239, 68, 68, 0.025);
+}
+
+.overdue-row:hover td {
+  background: rgba(239, 68, 68, 0.05) !important;
+}
+
+.overdue-table tr:hover td {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+/* Loan Ref Cell */
+.loan-ref-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.loan-ref-id {
+  font-family: monospace;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.loan-ref-purpose {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Due Date */
+.due-date-text {
+  font-size: 0.85rem;
+}
+
+.overdue-date {
+  color: #f87171;
+  font-weight: 600;
+}
+
+/* Overdue Amount Metric */
+.overdue-amount-val {
+  font-size: 1.1rem !important;
+  color: #f87171 !important;
+}
+
+/* Days Overdue Badge */
+.days-overdue-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.text-dim {
+  color: var(--text-dim);
+}
+
+/* Borrower Cell */
+.borrower-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.borrower-avatar-mini {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.borrower-cell-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.borrower-cell-name {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.borrower-cell-phone {
+  font-size: 0.725rem;
+  color: var(--text-muted);
+}
+
+.installment-tag {
+  font-size: 0.785rem;
+  font-weight: 600;
+  color: var(--accent-primary);
+  background: rgba(16, 185, 129, 0.08);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+}
+
+.amount-cell {
+  font-weight: 600;
+  font-size: 0.885rem;
+}
+
+.amount-cell.due {
+  color: var(--text-main);
+}
+
+.amount-cell.paid {
+  color: #34d399;
+}
+
+.amount-cell.outstanding {
+  color: #fbbf24;
+}
+
+.amount-cell.zero {
+  color: var(--text-muted);
+}
+

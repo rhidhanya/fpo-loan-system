@@ -17,12 +17,28 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, 'Password is required'],
+      required: [
+        function () {
+          return !this.googleId;
+        },
+        'Password is required',
+      ],
       select: false,
     },
     phone: {
       type: String,
-      required: [true, 'Phone number is required'],
+      required: [
+        function () {
+          return !this.googleId;
+        },
+        'Phone number is required',
+      ],
+      trim: true,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
       trim: true,
     },
     role: {
@@ -66,7 +82,7 @@ const userSchema = new mongoose.Schema(
 
 // Hash password before saving
 userSchema.pre('save', async function () {
-  if (!this.isModified('password')) {
+  if (!this.isModified('password') || !this.password) {
     return;
   }
   const salt = await bcrypt.genSalt(10);
@@ -75,6 +91,9 @@ userSchema.pre('save', async function () {
 
 // Compare password method
 userSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) {
+    return false;
+  }
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
