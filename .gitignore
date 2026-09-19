@@ -1,3 +1,11 @@
+<<<<<<< HEAD
+node_modules
+dist
+.env.local
+.env.*.local
+*.log
+.DS_Store
+=======
 # Dependencies
 node_modules/
 backend/node_modules/
@@ -32,3 +40,4 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+>>>>>>> 0d6e250755c11d2c1f25dccf35bd0adb6a19003d

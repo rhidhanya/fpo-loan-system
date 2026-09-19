@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Loan = require('../models/Loan');
+const { recordAuditLog } = require('./auditController');
 
 // @desc    Submit a new loan application
 // @route   POST /api/loans
@@ -282,6 +283,16 @@ const approveLoan = async (req, res) => {
 
     await loan.save();
 
+    // Audit log
+    await recordAuditLog(
+      req.user._id,
+      'LOAN_APPROVED',
+      'Loan',
+      loan._id,
+      `Loan application approved for ₹${loan.loanAmount}`,
+      { loanAmount: loan.loanAmount, interestRate: loan.interestRate, tenureMonths: loan.tenureMonths }
+    );
+
     return res.status(200).json({
       status: 'success',
       message: 'Loan application successfully approved',
@@ -406,6 +417,16 @@ const disburseLoan = async (req, res) => {
     // Generate Repayment Schedule automatically after disbursement
     const { generateRepaymentSchedule } = require('./repaymentController');
     const repayments = await generateRepaymentSchedule(loan);
+
+    // Audit log
+    await recordAuditLog(
+      req.user._id,
+      'LOAN_DISBURSED',
+      'Loan',
+      loan._id,
+      `Loan disbursed: ₹${amountToDisburse}`,
+      { disbursedAmount: amountToDisburse, disbursedDate: loan.disbursedDate }
+    );
 
     return res.status(200).json({
       status: 'success',

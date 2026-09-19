@@ -13,18 +13,81 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const { login, loading, error: authError, setError, isAuthenticated } = useAuth();
+  const { login, loginWithGoogle, loading, error: authError, setError, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/admin/dashboard';
-
-  // If already authenticated as FPO_ADMIN, redirect to dashboard
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
+  const getRedirectPath = (userRole) => {
+    if (userRole === 'FARMER') {
+      return '/farmer/dashboard';
     }
-  }, [isAuthenticated, navigate, from]);
+    if (location.state?.from?.pathname && !location.state.from.pathname.startsWith('/farmer') && location.state.from.pathname !== '/login') {
+      return location.state.from.pathname;
+    }
+    return '/admin/dashboard';
+  };
+
+  // If already authenticated, redirect to appropriate role dashboard
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(getRedirectPath(user.role), { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  // Initialize Google Identity Services
+  useEffect(() => {
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      return;
+    }
+
+    const handleGoogleCredentialResponse = async (response) => {
+      if (response && response.credential) {
+        setFormError('');
+        if (setError) setError(null);
+        const result = await loginWithGoogle(response.credential);
+        if (result.success && result.user) {
+          navigate(getRedirectPath(result.user.role), { replace: true });
+        }
+      }
+    };
+
+    const renderGoogleButton = () => {
+      if (window.google?.accounts?.id) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: handleGoogleCredentialResponse,
+          });
+
+          const btnElement = document.getElementById('google-signin-btn');
+          if (btnElement) {
+            window.google.accounts.id.renderButton(btnElement, {
+              theme: 'outline',
+              size: 'large',
+              width: btnElement.offsetWidth || 360,
+              text: 'continue_with',
+              shape: 'rectangular',
+            });
+          }
+        } catch (err) {
+          console.warn('Google Identity initialization error:', err);
+        }
+      }
+    };
+
+    if (window.google?.accounts?.id) {
+      renderGoogleButton();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(interval);
+          renderGoogleButton();
+        }
+      }, 150);
+      return () => clearInterval(interval);
+    }
+  }, [loginWithGoogle, navigate, location, setError]);
 
   const validateForm = () => {
     if (!email.trim()) {
@@ -53,8 +116,8 @@ const Login = () => {
     }
 
     const result = await login(email.trim(), password);
-    if (result.success) {
-      navigate(from, { replace: true });
+    if (result.success && result.user) {
+      navigate(getRedirectPath(result.user.role), { replace: true });
     }
   };
 
@@ -154,6 +217,14 @@ const Login = () => {
             )}
           </button>
         </form>
+
+        <div className="login-divider">
+          <span>OR</span>
+        </div>
+
+        <div className="google-auth-container">
+          <div id="google-signin-btn" className="google-btn-wrapper"></div>
+        </div>
 
         <div className="login-footer">
           <p>{t('login.footerText')}</p>
