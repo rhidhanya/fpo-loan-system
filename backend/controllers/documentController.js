@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Document = require('../models/Document');
 const Loan = require('../models/Loan');
 const { uploadToCloudinary, deleteFromCloudinary } = require('../config/cloudinary');
+const { recordAuditLog } = require('./auditController');
 
 const VALID_DOC_TYPES = [
   'ID_PROOF',
@@ -255,6 +256,16 @@ const verifyDocument = async (req, res) => {
 
     await document.save();
 
+    // Audit log
+    await recordAuditLog(
+      req.user._id,
+      'DOCUMENT_VERIFIED',
+      'Document',
+      document._id,
+      `Document "${document.documentName}" verified`,
+      { documentType: document.documentType }
+    );
+
     return res.status(200).json({
       status: 'success',
       message: 'Document verified successfully',
@@ -306,6 +317,16 @@ const rejectDocument = async (req, res) => {
     document.rejectionReason = rejectionReason.trim();
 
     await document.save();
+
+    // Audit log
+    await recordAuditLog(
+      req.user._id,
+      'DOCUMENT_REJECTED',
+      'Document',
+      document._id,
+      `Document "${document.documentName}" rejected: ${rejectionReason.trim()}`,
+      { documentType: document.documentType, rejectionReason: rejectionReason.trim() }
+    );
 
     return res.status(200).json({
       status: 'success',

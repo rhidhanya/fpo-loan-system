@@ -7,6 +7,7 @@ const authRoutes = require('./routes/authRoutes');
 const loanRoutes = require('./routes/loanRoutes');
 const documentRoutes = require('./routes/documentRoutes');
 const repaymentRoutes = require('./routes/repaymentRoutes');
+const auditRoutes = require('./routes/auditRoutes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/loans', loanRoutes);
 app.use('/api/documents', documentRoutes);
 app.use('/api/repayments', repaymentRoutes);
+app.use('/api/audit-logs', auditRoutes);
 
 // Health Check Endpoint
 app.get('/api/health', (req, res) => {

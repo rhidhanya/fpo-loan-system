@@ -13,6 +13,11 @@ import LoanDetail from './pages/LoanDetail';
 import Repayments from './pages/Repayments';
 import Reports from './pages/Reports';
 import Notifications from './pages/Notifications';
+import FarmerDashboard from './pages/FarmerDashboard';
+import DocumentVerification from './pages/DocumentVerification';
+import LoanDisbursement from './pages/LoanDisbursement';
+import Overdue from './pages/Overdue';
+import AuditLog from './pages/AuditLog';
 
 function App() {
   return (
@@ -22,11 +27,21 @@ function App() {
           {/* Public Route */}
           <Route path="/login" element={<Login />} />
 
+          {/* Protected Farmer Route */}
+          <Route
+            path="/farmer/dashboard"
+            element={
+              <ProtectedRoute requiredRole="FARMER">
+                <FarmerDashboard />
+              </ProtectedRoute>
+            }
+          />
+
           {/* Protected Admin Routes */}
           <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute requiredRole="FPO_ADMIN">
                 <AdminLayout />
               </ProtectedRoute>
             }
@@ -39,11 +54,15 @@ function App() {
             <Route path="repayments" element={<Repayments />} />
             <Route path="reports" element={<Reports />} />
             <Route path="notifications" element={<Notifications />} />
+            <Route path="documents" element={<DocumentVerification />} />
+            <Route path="disbursements" element={<LoanDisbursement />} />
+            <Route path="overdue" element={<Overdue />} />
+            <Route path="audit-log" element={<AuditLog />} />
           </Route>
 
           {/* Root fallback */}
-          <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
-          <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </AuthProvider>

@@ -13,6 +13,10 @@ import {
   ChevronLeft,
   ChevronRight,
   X,
+  FileCheck,
+  Banknote,
+  AlertTriangle,
+  ScrollText,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import './Sidebar.css';
@@ -27,12 +31,16 @@ const Sidebar = ({ isCollapsed, onToggleCollapse, isMobileOpen, onCloseMobile })
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/admin/dashboard', icon: LayoutDashboard },
-    { label: 'Farmers', path: '/admin/farmers', icon: Users },
-    { label: 'Loan Applications', path: '/admin/loans', icon: FileText },
-    { label: 'Repayments', path: '/admin/repayments', icon: CreditCard },
-    { label: 'Reports', path: '/admin/reports', icon: BarChart3 },
-    { label: 'Notifications', path: '/admin/notifications', icon: Bell },
+    { label: 'Dashboard',            path: '/admin/dashboard',     icon: LayoutDashboard },
+    { label: 'Farmers',              path: '/admin/farmers',        icon: Users },
+    { label: 'Loan Applications',    path: '/admin/loans',          icon: FileText },
+    { label: 'Document Verification',path: '/admin/documents',      icon: FileCheck },
+    { label: 'Loan Disbursement',    path: '/admin/disbursements',  icon: Banknote },
+    { label: 'Repayments',           path: '/admin/repayments',     icon: CreditCard },
+    { label: 'Overdue / Defaulters', path: '/admin/overdue',        icon: AlertTriangle },
+    { label: 'Reports',              path: '/admin/reports',        icon: BarChart3 },
+    { label: 'Notifications',        path: '/admin/notifications',  icon: Bell },
+    { label: 'Audit Log',            path: '/admin/audit-log',      icon: ScrollText },
   ];
 
   return (

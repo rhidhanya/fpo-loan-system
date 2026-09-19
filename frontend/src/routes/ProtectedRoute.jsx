@@ -3,14 +3,14 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Loading from '../components/Loading';
 
-const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isAdmin, initializing } = useAuth();
+const ProtectedRoute = ({ children, requiredRole = 'FPO_ADMIN' }) => {
+  const { isAuthenticated, user, initializing } = useAuth();
   const location = useLocation();
 
   if (initializing) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)' }}>
-        <Loading message="Verifying Admin Authorization..." />
+        <Loading message={`Verifying ${requiredRole === 'FPO_ADMIN' ? 'Admin' : 'Farmer'} Authorization...`} />
       </div>
     );
   }
@@ -19,7 +19,13 @@ const ProtectedRoute = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (!isAdmin) {
+  // Cross-role protection
+  if (requiredRole && user?.role !== requiredRole) {
+    if (user?.role === 'FARMER') {
+      return <Navigate to="/farmer/dashboard" replace />;
+    } else if (user?.role === 'FPO_ADMIN') {
+      return <Navigate to="/admin/dashboard" replace />;
+    }
     return <Navigate to="/login" replace />;
   }
 

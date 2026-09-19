@@ -1,5 +1,8 @@
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
+const { OAuth2Client } = require('google-auth-library');
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // @desc    Register new User (FARMER or FPO_ADMIN)
 // @route   POST /api/auth/register
@@ -176,8 +179,124 @@ const getMe = async (req, res) => {
   }
 };
 
+// @desc    Authenticate User via Google ID token
+// @route   POST /api/auth/google
+// @access  Public
+const googleAuth = async (req, res) => {
+  try {
+    const idToken = req.body.idToken || req.body.token || req.body.credential;
+
+    if (!idToken) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Google ID token is required',
+      });
+    }
+
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      return res.status(500).json({
+        status: 'error',
+        message: 'Google client ID is not configured on the server',
+      });
+    }
+
+    // Verify token with Google's official library
+    let payload;
+    try {
+      const ticket = await googleClient.verifyIdToken({
+        idToken,
+        audience: clientId,
+      });
+      payload = ticket.getPayload();
+    } catch (verifyError) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Invalid or expired Google token',
+      });
+    }
+
+    if (!payload || !payload.email) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Google token does not contain a valid email address',
+      });
+    }
+
+    const googleId = payload.sub;
+    const email = payload.email.toLowerCase().trim();
+    const name = payload.name || email.split('@')[0] || 'Google User';
+
+    // 1. Check if user already exists with this googleId
+    let user = await User.findOne({ googleId });
+
+    // 2. If not found by googleId, check by email
+    if (!user) {
+      user = await User.findOne({ email });
+      if (user) {
+        // Safely link Google identity to existing account
+        // DO NOT change the user's existing role!
+        user.googleId = googleId;
+        await user.save();
+      }
+    }
+
+    // 3. If no user exists, create a new user with default role FARMER
+    // NEVER allow frontend or Google token to create an FPO_ADMIN account
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        role: 'FARMER',
+        status: 'ACTIVE',
+      });
+    }
+
+    // 4. Account status check
+    if (user.status !== 'ACTIVE') {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'Account is inactive or suspended',
+      });
+    }
+
+    // 5. Generate existing application JWT
+    const token = generateToken(user._id, user.role);
+
+    // 6. Return standard user payload
+    const userPayload = {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      phone: user.phone,
+      role: user.role,
+      fpoName: user.fpoName,
+      fpoRegistrationNo: user.fpoRegistrationNo,
+      address: user.address,
+      kycVerified: user.kycVerified,
+      status: user.status,
+      createdAt: user.createdAt,
+    };
+
+    return res.status(200).json({
+      status: 'success',
+      token,
+      data: {
+        user: userPayload,
+      },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: 'error',
+      message: error.message || 'Server error during Google authentication',
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   getMe,
+  googleAuth,
 };

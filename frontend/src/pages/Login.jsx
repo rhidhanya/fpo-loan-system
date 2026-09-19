@@ -10,18 +10,81 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState('');
 
-  const { login, loading, error: authError, setError, isAuthenticated } = useAuth();
+  const { login, loginWithGoogle, loading, error: authError, setError, isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/admin/dashboard';
-
-  // If already authenticated as FPO_ADMIN, redirect to dashboard
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate(from, { replace: true });
+  const getRedirectPath = (userRole) => {
+    if (userRole === 'FARMER') {
+      return '/farmer/dashboard';
     }
-  }, [isAuthenticated, navigate, from]);
+    if (location.state?.from?.pathname && !location.state.from.pathname.startsWith('/farmer') && location.state.from.pathname !== '/login') {
+      return location.state.from.pathname;
+    }
+    return '/admin/dashboard';
+  };
+
+  // If already authenticated, redirect to appropriate role dashboard
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate(getRedirectPath(user.role), { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
+
+  // Initialize Google Identity Services
+  useEffect(() => {
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    if (!googleClientId) {
+      return;
+    }
+
+    const handleGoogleCredentialResponse = async (response) => {
+      if (response && response.credential) {
+        setFormError('');
+        if (setError) setError(null);
+        const result = await loginWithGoogle(response.credential);
+        if (result.success && result.user) {
+          navigate(getRedirectPath(result.user.role), { replace: true });
+        }
+      }
+    };
+
+    const renderGoogleButton = () => {
+      if (window.google?.accounts?.id) {
+        try {
+          window.google.accounts.id.initialize({
+            client_id: googleClientId,
+            callback: handleGoogleCredentialResponse,
+          });
+
+          const btnElement = document.getElementById('google-signin-btn');
+          if (btnElement) {
+            window.google.accounts.id.renderButton(btnElement, {
+              theme: 'outline',
+              size: 'large',
+              width: btnElement.offsetWidth || 360,
+              text: 'continue_with',
+              shape: 'rectangular',
+            });
+          }
+        } catch (err) {
+          console.warn('Google Identity initialization error:', err);
+        }
+      }
+    };
+
+    if (window.google?.accounts?.id) {
+      renderGoogleButton();
+    } else {
+      const interval = setInterval(() => {
+        if (window.google?.accounts?.id) {
+          clearInterval(interval);
+          renderGoogleButton();
+        }
+      }, 150);
+      return () => clearInterval(interval);
+    }
+  }, [loginWithGoogle, navigate, location, setError]);
 
   const validateForm = () => {
     if (!email.trim()) {
@@ -50,8 +113,8 @@ const Login = () => {
     }
 
     const result = await login(email.trim(), password);
-    if (result.success) {
-      navigate(from, { replace: true });
+    if (result.success && result.user) {
+      navigate(getRedirectPath(result.user.role), { replace: true });
     }
   };
 
@@ -64,7 +127,7 @@ const Login = () => {
           <div className="login-brand-icon">
             <Building2 size={28} />
           </div>
-          <h1>FPO Admin Portal</h1>
+          <h1>FPO Portal</h1>
           <p>Farmer Producer Organization Credit Management</p>
         </div>
 
@@ -80,7 +143,7 @@ const Login = () => {
         <form onSubmit={handleSubmit} className="login-form" noValidate>
           <div className="form-group">
             <label className="form-label" htmlFor="admin-email">
-              Admin Email Address
+              Email Address
             </label>
             <div className="input-wrapper">
               <Mail size={18} className="input-icon" />
@@ -88,7 +151,7 @@ const Login = () => {
                 id="admin-email"
                 type="email"
                 className="form-input with-icon"
-                placeholder="admin@fpo.org"
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
@@ -137,19 +200,27 @@ const Login = () => {
             {loading ? (
               <>
                 <Loader2 size={18} className="spinner-icon" />
-                <span>Authenticating Admin...</span>
+                <span>Authenticating...</span>
               </>
             ) : (
               <>
-                <span>Sign In to Admin Portal</span>
+                <span>Sign In to Portal</span>
                 <ArrowRight size={18} />
               </>
             )}
           </button>
         </form>
 
+        <div className="login-divider">
+          <span>OR</span>
+        </div>
+
+        <div className="google-auth-container">
+          <div id="google-signin-btn" className="google-btn-wrapper"></div>
+        </div>
+
         <div className="login-footer">
-          <p>Strictly restricted to FPO_ADMIN accounts.</p>
+          <p>Authorized access for Farmer Members & FPO Administrators.</p>
         </div>
       </div>
     </div>

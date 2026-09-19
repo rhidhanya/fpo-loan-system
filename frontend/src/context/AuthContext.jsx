@@ -39,11 +39,11 @@ export const AuthProvider = ({ children }) => {
         const response = await authAPI.getMe();
         const currentUser = response.data?.data?.user;
 
-        if (currentUser && currentUser.role === 'FPO_ADMIN') {
+        if (currentUser && (currentUser.role === 'FPO_ADMIN' || currentUser.role === 'FARMER') && currentUser.status === 'ACTIVE') {
           setUser(currentUser);
           localStorage.setItem('fpo_admin_user', JSON.stringify(currentUser));
         } else {
-          // Token is valid but user is not FPO_ADMIN or account status invalid
+          // Account status invalid or unauthorized role
           logout();
         }
       } catch (err) {
@@ -76,9 +76,8 @@ export const AuthProvider = ({ children }) => {
       const { token: jwtToken, data } = response.data;
       const loggedUser = data?.user;
 
-      // Role Verification Safeguard: Block FARMER role from accessing Admin Portal
-      if (!loggedUser || loggedUser.role !== 'FPO_ADMIN') {
-        const errMsg = 'Access Denied: Admin portal requires FPO_ADMIN privileges. Farmer accounts are not authorized.';
+      if (!loggedUser) {
+        const errMsg = 'Login failed. User profile data missing.';
         setError(errMsg);
         setLoading(false);
         return { success: false, message: errMsg };
@@ -98,7 +97,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('fpo_admin_user', JSON.stringify(loggedUser));
 
       setLoading(false);
-      return { success: true };
+      return { success: true, user: loggedUser };
     } catch (err) {
       const message = err.response?.data?.message || 'Login failed. Please check your credentials and try again.';
       setError(message);
@@ -107,8 +106,48 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const loginWithGoogle = async (googleIdToken) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await authAPI.googleLogin(googleIdToken);
+      const { token: jwtToken, data } = response.data;
+      const loggedUser = data?.user;
+
+      if (!loggedUser) {
+        const errMsg = 'Google authentication failed. User profile data missing.';
+        setError(errMsg);
+        setLoading(false);
+        return { success: false, message: errMsg };
+      }
+
+      // Check account status
+      if (loggedUser.status !== 'ACTIVE') {
+        const errMsg = 'Access Denied: Account is inactive or suspended.';
+        setError(errMsg);
+        setLoading(false);
+        return { success: false, message: errMsg };
+      }
+
+      setToken(jwtToken);
+      setUser(loggedUser);
+      localStorage.setItem('fpo_admin_token', jwtToken);
+      localStorage.setItem('fpo_admin_user', JSON.stringify(loggedUser));
+
+      setLoading(false);
+      return { success: true, user: loggedUser };
+    } catch (err) {
+      const message = err.response?.data?.message || 'Google authentication failed. Please try again.';
+      setError(message);
+      setLoading(false);
+      return { success: false, message };
+    }
+  };
+
   const isAuthenticated = !!token && !!user;
   const isAdmin = isAuthenticated && user?.role === 'FPO_ADMIN';
+  const isFarmer = isAuthenticated && user?.role === 'FARMER';
 
   return (
     <AuthContext.Provider
@@ -120,9 +159,11 @@ export const AuthProvider = ({ children }) => {
         error,
         setError,
         login,
+        loginWithGoogle,
         logout,
         isAuthenticated,
         isAdmin,
+        isFarmer,
       }}
     >
       {children}

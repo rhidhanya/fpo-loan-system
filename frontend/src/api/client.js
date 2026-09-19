@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -47,10 +47,12 @@ export const authAPI = {
   login: (credentials) => apiClient.post('/auth/login', credentials),
   register: (userData) => apiClient.post('/auth/register', userData),
   getMe: () => apiClient.get('/auth/me'),
+  googleLogin: (token) => apiClient.post('/auth/google', { token }),
 };
 
 export const loanAPI = {
   getAllLoans: (params) => apiClient.get('/loans', { params }),
+  getMyLoans: () => apiClient.get('/loans/my'),
   getLoanById: (id) => apiClient.get(`/loans/${id}`),
   markUnderReview: (id) => apiClient.put(`/loans/${id}/under-review`),
   approveLoan: (id, body) => apiClient.put(`/loans/${id}/approve`, body),
@@ -60,6 +62,7 @@ export const loanAPI = {
 
 export const documentAPI = {
   getAllDocuments: (params) => apiClient.get('/documents', { params }),
+  getMyDocuments: () => apiClient.get('/documents/my'),
   getLoanDocuments: (loanId) => apiClient.get(`/documents/loan/${loanId}`),
   verifyDocument: (id) => apiClient.put(`/documents/${id}/verify`),
   rejectDocument: (id, body) => apiClient.put(`/documents/${id}/reject`, body),
@@ -67,6 +70,11 @@ export const documentAPI = {
 
 export const repaymentAPI = {
   getAllRepayments: (params) => apiClient.get('/repayments', { params }),
+  getMyRepayments: () => apiClient.get('/repayments/my'),
   getLoanRepayments: (loanId) => apiClient.get(`/repayments/loan/${loanId}`),
   markRepaymentPaid: (id, body) => apiClient.put(`/repayments/${id}/pay`, body),
+};
+
+export const auditAPI = {
+  getAuditLogs: (params) => apiClient.get('/audit-logs', { params }),
 };
